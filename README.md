@@ -63,3 +63,15 @@ npm run Build
 ```
 npm start
 ```
+
+## Deployment with Docker
+
+### Build container
+```
+docker build -t hotel-merge .
+```
+
+### Run container
+```
+docker run -it -p 3000:3000 hotel-merge
+```
