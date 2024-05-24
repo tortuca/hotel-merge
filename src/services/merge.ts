@@ -48,17 +48,28 @@ export const testFetch = async () => {
 }
 
 export const searchHotels = async (download: boolean, destination: number, hotels: string[]) => {
-    const cachedData = cache.get(`${destination}:${hotels}`);
-    if (cachedData) {
-        console.log(`[cache] found ${destination}:${hotels}`);
-        return cachedData;
+    try {
+        const cachedData = cache.get(`${destination}:${hotels}`);
+        if (cachedData) {
+            console.log(`[cache] found ${destination}:${hotels}`);
+            return cachedData;
+        }
+        let data : Hotel[] | undefined = cache.get('all');
+        if (!data) {
+            data = await loadHotels();
+            cache.set('all', data);
+            console.log(`[cache] saved all data`);
+        }
+
+        const result = data.filter(item => filterDestination(item, destination))
+            .filter(item => filterHotels(item, hotels));
+        cache.set(`${destination}:${hotels}`, result);
+        console.log(`[cache] saved ${destination}:${hotels}`);
+        return result;
+    } catch (error) {
+        console.error('[error] unable to load cache:', error);
+        throw error;
     }
-    const data = await loadHotels();
-    const result = data.filter(item => filterDestination(item, destination))
-        .filter(item => filterHotels(item, hotels));
-    cache.set(`${destination}:${hotels}`, result);
-    console.log(`[cache] saved ${destination}:${hotels}`);
-    return result;
 }
 
 export const filterDestination = (row: any, destination: number) => {
