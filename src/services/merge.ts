@@ -2,9 +2,6 @@ import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
 
-import acmeJson from '../../data/acme.json';
-import paperfliesJson from '../../data/paperflies.json';
-import patagoniaJson from '../../data/patagonia.json';
 import { Hotel, ImageUrl } from '../models/hotel.model';
 import cache from './cache';
 
@@ -88,7 +85,7 @@ export const loadHotels = async () => {
         // Parse JSON after reading all files
         const paperfliesJson = JSON.parse(paperfliesData);
         const acmeJson = JSON.parse(acmeData);
-        const patagoniJson = JSON.parse(patagoniaData);
+        const patagoniaJson = JSON.parse(patagoniaData);
 
         return mergeSuppliers(paperfliesJson, acmeJson, patagoniaJson);
     } catch (error) {
