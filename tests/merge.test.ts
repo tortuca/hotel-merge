@@ -1,4 +1,4 @@
-import { convertSnakeToPascal, convertSnakeToTags, findLongestName, getHotels, removeDuplicates, removeStringsIfPresent } from "../src/services/merge";
+import { convertSnakeToPascal, convertSnakeToTags, findLongestName, searchHotels, removeDuplicates, removeStringsIfPresent } from "../src/services/merge";
 
 describe('Get hotels', () => {
     let mockRequest: Partial<Request>;
@@ -7,7 +7,7 @@ describe('Get hotels', () => {
     let responseSend: jest.Mock;
     
     it('responds with 200', async () => {
-        let response = await getHotels(false, 0, ['']);
+        let response = await searchHotels(false, 0, ['']);
         expect(response).toBeDefined();
     });
 });

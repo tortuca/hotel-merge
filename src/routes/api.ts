@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { getHotels, getSuppliers, testFetch } from '../services/merge';
+import { searchHotels, getSuppliers, testFetch } from '../services/merge';
 
 const router: Router = Router();
 
@@ -10,24 +10,22 @@ router.get('/test', async (req: Request, res: Response) => {
 
 router.get('/query', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        let destinationQ: number = -1;
-        if (req.query.destination) {
-            destinationQ = Number(req.query.destination);
-        }
+        const { destination, hotels } = req.query;
+        console.log(`[query] dest=${destination} hotels=${hotels}`);
+        const destinationQ = destination ? Number(destination) : -1;
         let hotelsQ: string[] = [];
-        if (req.query.hotels) {
-            if (typeof req.query.hotels !== 'string' || typeof req.query.hotels[0] !== 'string') {
-                res.status(400).send();
+        if (hotels) {
+            if (typeof hotels === 'string') {
+                hotelsQ = [hotels];
+            } else if (Array.isArray(hotels) && hotels.every(item => typeof item === 'string')) {
+                hotelsQ = hotels as any;
+            } else {
+                res.status(400).send('Invalid hotels parameter');
                 return;
             }
-
-            if (typeof req.query.hotels === "string") {
-                hotelsQ = [req.query.hotels];
-            } else {
-                hotelsQ = req.query.hotels;
-            }
         }
-        res.status(200).json(await getHotels(true, destinationQ, hotelsQ));
+        const download = (process.env.DOWNLOAD || 'true') === 'true';
+        res.status(200).json(await searchHotels(download, destinationQ, hotelsQ));
         return res;
     } catch (err) {
         res.status(500).send();
@@ -37,7 +35,7 @@ router.get('/query', async (req: Request, res: Response, next: NextFunction) => 
 
 router.get('/suppliers', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        await getSuppliers(true);
+        res.status(200).json(await getSuppliers(true));
     } catch (err) {
         return next(err);
     }

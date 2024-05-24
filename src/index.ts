@@ -1,6 +1,7 @@
 import express, { Application, Request, Response } from 'express';
 import dotenv from 'dotenv';
 import router from './routes/api';
+import { URLSearchParams } from 'url';
 
 dotenv.config();
 
@@ -8,10 +9,9 @@ const app: Application = express();
 const port = process.env.PORT || 3000;
 
 app.use(router);
-app.set('query parser', 'simple');
 
 app.get('/', (req: Request, res: Response) => {
-    res.send('Room Merge 2');
+    res.send('Hotel Merge');
 });
 
 app.listen(port, () => {

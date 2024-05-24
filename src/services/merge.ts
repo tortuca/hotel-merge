@@ -1,10 +1,12 @@
 import dotenv from 'dotenv';
 import fs from 'fs';
+import path from 'path';
 
 import acmeJson from '../../data/acme.json';
 import paperfliesJson from '../../data/paperflies.json';
 import patagoniaJson from '../../data/patagonia.json';
 import { Hotel, ImageUrl } from '../models/hotel.model';
+import cache from './cache';
 
 dotenv.config();
 
@@ -23,9 +25,10 @@ export const getSuppliers = async (download: boolean) => {
             } else {
                 const data = await response.json();
                 let supplier = el.split('/').pop();
-                fs.writeFile(`../../data/${supplier}.json`, JSON.stringify(data), function(err) {
+                const filePath = path.resolve(__dirname, '..', '..', 'data', `${supplier}.json`);
+                fs.writeFile(filePath, JSON.stringify(data), (err) => {
                     if (err) {
-                        console.log(err);
+                        console.log(`[error] file: ${err}`);
                     }
                 });
                 return { data, error: null };
@@ -33,7 +36,7 @@ export const getSuppliers = async (download: boolean) => {
         }));
         return responses;
     } catch (error) {
-        console.error('Error fetching suppliers:', error);
+        console.error('[error] unable to fetch suppliers:', error);
         throw error;
     }
 }
@@ -47,31 +50,62 @@ export const testFetch = async () => {
     }
 }
 
-export const getHotels = async (download: boolean, destination: number, hotels: string[]) => {
-    await getSuppliers(download);
-    return mergeSuppliers(destination, hotels);
+export const searchHotels = async (download: boolean, destination: number, hotels: string[]) => {
+    const cachedData = cache.get(`${destination}:${hotels}`);
+    if (cachedData) {
+        console.log(`[cache] found ${destination}:${hotels}`);
+        return cachedData;
+    }
+    const data = await loadHotels();
+    const result = data.filter(item => filterDestination(item, destination))
+        .filter(item => filterHotels(item, hotels));
+    cache.set(`${destination}:${hotels}`, result);
+    console.log(`[cache] saved ${destination}:${hotels}`);
+    return result;
 }
 
-export const mergeSuppliers = async (destination: number, hotels: string[]) => {
-    // load data into memory
-    // only transform a subset according to query, for better performance
-    const result: Hotel[] = structuredClone(paperfliesJson)
-        .filter(room => destination == -1 || room.destination_id === destination)
-        .filter(room => hotels.length == 0 || hotels.includes(room.hotel_id))
-        .map(transformPaperflies);
-    const acme = structuredClone(acmeJson)
-        .filter(room => destination == -1 || room.DestinationId === destination)
-        .filter(room => hotels.length == 0 || hotels.includes(room.Id))
-        .map(transformAcme)
-    const patagonia = structuredClone(patagoniaJson)
-        .filter(room => destination == -1 || room.destination === destination)
-        .filter(room => hotels.length == 0 || hotels.includes(room.id))
-        .map(transformPatagonia);
+export const filterDestination = (row: any, destination: number) => {
+    return destination === -1 || row.destination === destination;
+}
+
+export const filterHotels = (row: any, hotels: string[]) => {
+    return hotels.length === 0 || hotels.includes(row.id);
+}
+
+export const loadHotels = async () => {
+    try {
+        const download = (process.env.DOWNLOAD || 'true') === 'true';
+        await getSuppliers(download);
+        const paperfliesPath = path.resolve(__dirname, '..', '..', 'data', 'paperflies.json');
+        const acmePath = path.resolve(__dirname, '..', '..', 'data', 'acme.json');
+        const patagoniaPath = path.resolve(__dirname, '..', '..', 'data', 'patagonia.json');
+
+        const [paperfliesData, acmeData, patagoniaData] = await Promise.all([
+            fs.promises.readFile(paperfliesPath, 'utf8'),
+            fs.promises.readFile(acmePath, 'utf8'),
+            fs.promises.readFile(patagoniaPath, 'utf8')
+        ]);
+        // Parse JSON after reading all files
+        const paperfliesJson = JSON.parse(paperfliesData);
+        const acmeJson = JSON.parse(acmeData);
+        const patagoniJson = JSON.parse(patagoniaData);
+
+        return mergeSuppliers(paperfliesJson, acmeJson, patagoniaJson);
+    } catch (error) {
+        console.error('[error] unable to load files:', error);
+        throw error;
+    }
+}
+
+export const mergeSuppliers = async (paperfliesJson: any, acmeJson: any, patagoniaJson: any) => {
+    const result: Hotel[] = paperfliesJson.map(transformPaperflies);
+    const acme = acmeJson.map(transformAcme)
+    const patagonia = patagoniaJson.map(transformPatagonia);
 
     // aggregating and merging data
     for (const el of result) {
-        const patItem = patagonia.find(item => item.id == el.id);
-        const acmeItem = acme.find(item => item.id == el.id);
+        const patItem = patagonia.find((item: { id: string; }) => item.id == el.id);
+        const acmeItem = acme.find((item: { id: string; }) => item.id == el.id);
 
         el.name = findLongestName([el.name, patItem?.name, acmeItem?.name]);
         el.description = findLongestName([el.description, patItem?.description, acmeItem?.description]);
