@@ -10,12 +10,13 @@ dotenv.config();
 
 const suppliers: string[] = (process.env.SUPPLIERS || '').split(',');
 
-export const getSuppliers = async () => {
+export const getSuppliers = async (download: boolean) => {
+    if (!download) return {};
     try {
         // parallel fetching for all suppliers to speed up performance
         const responses = await Promise.all(suppliers.map(async (el) => {
             const response = await fetch(el);
-            console.log(response.status, response.ok, el, 'fetch');
+            console.log('[fetch]', response.status, el);
             if (!response.ok) {
                 console.log(el, `[error] HTTP: ${response.status}`);
                 return { data: null, error: `HTTP: ${response.status}` };
@@ -47,19 +48,28 @@ export const testFetch = async () => {
 }
 
 export const getHotels = async (download: boolean, destination: number, hotels: string[]) => {
-    if (download) {
-        await getSuppliers();
-    }
+    await getSuppliers(download);
     return mergeSuppliers(destination, hotels);
 }
 
 export const mergeSuppliers = async (destination: number, hotels: string[]) => {
-    const result: Hotel[] = structuredClone(paperfliesJson).map(transformPaperflies);
-    const acme = structuredClone(acmeJson).map(transformAcme);
-    const patagonia = structuredClone(patagoniaJson).map(transformPatagonia);
+    // load data into memory
+    // only transform a subset according to query, for better performance
+    const result: Hotel[] = structuredClone(paperfliesJson)
+        .filter(room => destination == -1 || room.destination_id === destination)
+        .filter(room => hotels.length == 0 || hotels.includes(room.hotel_id))
+        .map(transformPaperflies);
+    const acme = structuredClone(acmeJson)
+        .filter(room => destination == -1 || room.DestinationId === destination)
+        .filter(room => hotels.length == 0 || hotels.includes(room.Id))
+        .map(transformAcme)
+    const patagonia = structuredClone(patagoniaJson)
+        .filter(room => destination == -1 || room.destination === destination)
+        .filter(room => hotels.length == 0 || hotels.includes(room.id))
+        .map(transformPatagonia);
 
+    // aggregating and merging data
     for (const el of result) {
-        // aggregating data
         const patItem = patagonia.find(item => item.id == el.id);
         const acmeItem = acme.find(item => item.id == el.id);
 

@@ -10,30 +10,24 @@ router.get('/test', async (req: Request, res: Response) => {
 
 router.get('/query', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        let rooms = await getHotels(false, 0, ['']);
-        if (rooms == null || rooms.length == 0) return res.status(200).json({});
-        
-        console.log(req.query, rooms.length);
+        let destinationQ: number = -1;
         if (req.query.destination) {
-            rooms = rooms.filter(room => room['destination'] === Number(req.query.destination));
-            console.log('dd', req.query.destination, rooms.length);
+            destinationQ = Number(req.query.destination);
         }
+        let hotelsQ: string[] = [];
         if (req.query.hotels) {
             if (typeof req.query.hotels !== 'string' || typeof req.query.hotels[0] !== 'string') {
                 res.status(400).send();
                 return;
             }
 
-            let hotelsQ: string[];
             if (typeof req.query.hotels === "string") {
                 hotelsQ = [req.query.hotels];
             } else {
                 hotelsQ = req.query.hotels;
             }
-            rooms = rooms.filter(room => hotelsQ.includes(room['id']));
-            console.log('hh', hotelsQ, rooms.length);
         }
-        res.status(200).json(rooms);
+        res.status(200).json(await getHotels(true, destinationQ, hotelsQ));
         return res;
     } catch (err) {
         res.status(500).send();
@@ -43,7 +37,7 @@ router.get('/query', async (req: Request, res: Response, next: NextFunction) => 
 
 router.get('/suppliers', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        await getSuppliers();
+        await getSuppliers(true);
     } catch (err) {
         return next(err);
     }
