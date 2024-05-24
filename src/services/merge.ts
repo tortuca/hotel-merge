@@ -40,28 +40,25 @@ export const getSuppliers = async () => {
 export const testFetch = async () => {
     try {
         const response = await fetch('https://5f2be0b4ffc88500167b85a0.mockapi.io/suppliers/acme');
-        console.log(response.status);
         const data = await response.json();
-        console.log(data);
     } catch (error) {
         throw error;
     }
 }
 
-export const getHotels = async () => {
-    const download = false;
+export const getHotels = async (download: boolean, destination: number, hotels: string[]) => {
     if (download) {
         await getSuppliers();
     }
-    return mergeSuppliers();
+    return mergeSuppliers(destination, hotels);
 }
 
-export const mergeSuppliers = async () => {
-    const hotels: Hotel[] = structuredClone(paperfliesJson).map(transformPaperflies);
+export const mergeSuppliers = async (destination: number, hotels: string[]) => {
+    const result: Hotel[] = structuredClone(paperfliesJson).map(transformPaperflies);
     const acme = structuredClone(acmeJson).map(transformAcme);
     const patagonia = structuredClone(patagoniaJson).map(transformPatagonia);
 
-    for (const el of hotels) {
+    for (const el of result) {
         // aggregating data
         const patItem = patagonia.find(item => item.id == el.id);
         const acmeItem = acme.find(item => item.id == el.id);
@@ -88,9 +85,10 @@ export const mergeSuppliers = async () => {
             rooms: mergeDedupe([el.images?.rooms, patItem?.images?.rooms, acmeItem?.images?.rooms])
         };
 
+        // remove general amenities if found in room
         el.amenities.general = removeStringsIfPresent(el.amenities.general, el.amenities.room);
     }
-    return hotels;
+    return result;
 }
 
 const transformPaperflies = (input: any) => {
@@ -170,22 +168,12 @@ const transformImages = (input: any) => {
     return input;
 }
 
-const transformField = (input: any) => {
-    const output = Object.assign({}, input);
-    // TODO: transform row
-    return output;
-}
-
-const transformData = (input: any) => {
-    return input.map(transformField);
-}
-
 const mergeDedupe = (arr: any) => {
     let set = [...new Set([].concat(...arr))];
     return set.filter(x => x != undefined);
 }
 
-const removeDuplicates = (arr: string[]) => {
+export const removeDuplicates = (arr: string[]) => {
     const seen = new Set();
     const unique : string[] = [];
 
@@ -200,12 +188,12 @@ const removeDuplicates = (arr: string[]) => {
     return unique;
 }
 
-const removeStringsIfPresent = (arr1: string[], arr2: string[]) => {
+export const removeStringsIfPresent = (arr1: string[], arr2: string[]) => {
     const remove = new Set(arr2.map(str => str.replace(/\s+/g, '')));
     return arr1.filter(str => !remove.has(str.replace(/\s+/g, '')));
 }
 
-const findLongestName = (arr: string[]) => {
+export const findLongestName = (arr: string[]) => {
     return arr.filter(x => x != undefined).reduce((a, b) => a.length < b.length ? b : a, "");
 }
 

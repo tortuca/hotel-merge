@@ -4,12 +4,13 @@ import { getHotels, getSuppliers, testFetch } from '../services/merge';
 const router: Router = Router();
 
 router.get('/test', async (req: Request, res: Response) => {
-    res.status(200).json(await testFetch());
+    // res.status(200).json(await testFetch());
+    res.status(200).json('test');
 });
 
 router.get('/query', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        let rooms = await getHotels();
+        let rooms = await getHotels(false, 0, ['']);
         if (rooms == null || rooms.length == 0) return res.status(200).json({});
         
         console.log(req.query, rooms.length);
@@ -35,6 +36,7 @@ router.get('/query', async (req: Request, res: Response, next: NextFunction) => 
         res.status(200).json(rooms);
         return res;
     } catch (err) {
+        res.status(500).send();
         return next(err);
     }
 })
