@@ -3,9 +3,9 @@ import { searchHotels, getSuppliers, testFetch } from '../services/merge';
 
 const router: Router = Router();
 
-router.get('/test', async (req: Request, res: Response) => {
+router.get('/health', async (req: Request, res: Response) => {
     // res.status(200).json(await testFetch());
-    res.status(200).json('test');
+    res.status(200).send('OK');
 });
 
 router.get('/query', async (req: Request, res: Response, next: NextFunction) => {

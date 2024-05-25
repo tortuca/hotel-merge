@@ -20,10 +20,11 @@ afterEach(() => {
 //     });
 // });
 
-describe('Test', () => {
-    it('test', async () => {
-        const response = await request(app).get('/test').send();
+describe('Health', () => {
+    it('health', async () => {
+        const response = await request(app).get('/health').send();
         expect(response.status).toBe(200);
+        expect(response.text).toBe('OK');
     });
 });
 
