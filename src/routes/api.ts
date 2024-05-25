@@ -16,7 +16,7 @@ router.get('/query', async (req: Request, res: Response, next: NextFunction) => 
         let hotelsQ: string[] = [];
         if (hotels) {
             if (typeof hotels === 'string') {
-                hotelsQ = [hotels];
+                hotelsQ = hotels.indexOf(',') > 0 ? hotels.split(',') : [hotels];
             } else if (Array.isArray(hotels) && hotels.every(item => typeof item === 'string')) {
                 hotelsQ = hotels as any;
             } else {

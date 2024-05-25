@@ -54,8 +54,10 @@ export const searchHotels = async (download: boolean, destination: number, hotel
             console.log(`[cache] found ${destination}:${hotels}`);
             return cachedData;
         }
+    
         let data : Hotel[] | undefined = cache.get('all');
         if (!data) {
+            // save initial download to cache - expires in x minutes
             data = await loadHotels();
             cache.set('all', data);
             console.log(`[cache] saved all data`);
@@ -72,12 +74,12 @@ export const searchHotels = async (download: boolean, destination: number, hotel
     }
 }
 
-export const filterDestination = (row: any, destination: number) => {
-    return destination === -1 || row.destination === destination;
+export const filterDestination = (item: any, destination: number) => {
+    return destination === -1 || item.destination === destination;
 }
 
-export const filterHotels = (row: any, hotels: string[]) => {
-    return hotels.length === 0 || hotels.includes(row.id);
+export const filterHotels = (item: any, hotels: string[]) => {
+    return hotels.length === 0 || hotels.includes(item.id);
 }
 
 export const loadHotels = async () => {
@@ -88,6 +90,7 @@ export const loadHotels = async () => {
         const acmePath = path.resolve(__dirname, '..', '..', 'data', 'acme.json');
         const patagoniaPath = path.resolve(__dirname, '..', '..', 'data', 'patagonia.json');
 
+        // load files in parallel
         const [paperfliesData, acmeData, patagoniaData] = await Promise.all([
             fs.promises.readFile(paperfliesPath, 'utf8'),
             fs.promises.readFile(acmePath, 'utf8'),

@@ -62,4 +62,18 @@ describe('Hotel Query', () => {
         expect(response.body).toBeDefined();
         expect(response.body.length).toEqual(2);
     });
+
+    it('Get hotel=f8c9,SjyX,iJhz', async () => {
+        const response = await request(app).get('/query?hotels=f8c9,SjyX,iJhz').send();
+        expect(response.status).toBe(200);
+        expect(response.body).toBeDefined();
+        expect(response.body.length).toEqual(3);
+    });
+
+    it('Get destination=5432&hotels=f8c9,SjyX,iJhz', async () => {
+        const response = await request(app).get('/query?destination=5432&hotels=f8c9,SjyX,iJhz').send();
+        expect(response.status).toBe(200);
+        expect(response.body).toBeDefined();
+        expect(response.body.length).toEqual(2);
+    });
 });
