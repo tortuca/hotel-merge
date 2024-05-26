@@ -9,6 +9,8 @@ dotenv.config();
 
 const suppliers: string[] = (process.env.SUPPLIERS || '').split(',');
 
+/*** Data functions ***/
+
 export const getSuppliers = async (download: boolean) => {
     if (!download) return {};
     try {
@@ -47,6 +49,14 @@ export const testFetch = async () => {
     }
 }
 
+export const filterDestination = (item: any, destination: number) => {
+    return destination === -1 || item.destination === destination;
+}
+
+export const filterHotels = (item: any, hotels: string[]) => {
+    return hotels.length === 0 || hotels.includes(item.id);
+}
+
 export const searchHotels = async (download: boolean, destination: number, hotels: string[]) => {
     try {
         const cachedData = cache.get(`${destination}:${hotels}`);
@@ -72,14 +82,6 @@ export const searchHotels = async (download: boolean, destination: number, hotel
         console.error('[error] unable to load cache:', error);
         throw error;
     }
-}
-
-export const filterDestination = (item: any, destination: number) => {
-    return destination === -1 || item.destination === destination;
-}
-
-export const filterHotels = (item: any, hotels: string[]) => {
-    return hotels.length === 0 || hotels.includes(item.id);
 }
 
 export const loadHotels = async () => {
@@ -145,6 +147,8 @@ export const mergeSuppliers = async (paperfliesJson: any, acmeJson: any, patagon
     }
     return result;
 }
+
+/*** Transformation functions ***/
 
 const transformPaperflies = (input: any) => {
     const output = {
@@ -222,6 +226,8 @@ const transformImages = (input: any) => {
     }
     return input;
 }
+
+/*** Utility functions ***/
 
 const mergeDedupe = (arr: any) => {
     let set = [...new Set([].concat(...arr))];
