@@ -1,4 +1,4 @@
-import { convertPascalToSnake, convertPascalToTags, findLongestName, searchHotels, removeDuplicates, removeStringsIfPresent } from "../src/services/merge";
+import { convertPascalToSnake, convertPascalToTags, findLongestName, searchHotels, removeDuplicateTags, removeStringsIfPresent } from "../src/services/merge";
 
 describe('Get hotels', () => {
     let mockRequest: Partial<Request>;
@@ -15,7 +15,7 @@ describe('Get hotels', () => {
 
 describe('Remove duplicates and strings if present ', () => {
     it('Pool, Pool, Breakfast, Gym', () => {
-        let conv = removeDuplicates(['Pool', 'Pool', 'Breakfast', 'Gym']);
+        let conv = removeDuplicateTags(['Pool', 'Pool', 'Breakfast', 'Gym']);
         expect(conv.length).toEqual(3);
         expect(conv).toEqual(['Pool', 'Breakfast', 'Gym']);
     });

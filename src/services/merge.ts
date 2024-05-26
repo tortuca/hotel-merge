@@ -133,13 +133,14 @@ export const mergeSuppliers = async (paperfliesJson: any, acmeJson: any, patagon
         };
         
         el.amenities = {
-            room: removeDuplicates(mergeDedupe([el.amenities.room, patItem?.amenities])),
-            general: removeDuplicates(mergeDedupe([el.amenities.general, acmeItem?.amenities]))
+            room: removeDuplicateTags(mergeDedupe([el.amenities.room, patItem?.amenities])),
+            general: removeDuplicateTags(mergeDedupe([el.amenities.general, acmeItem?.amenities]))
         };
 
         el.images = {
-            site: mergeDedupe([el.images?.site, patItem?.images?.amenities, acmeItem?.images?.site]),
-            rooms: mergeDedupe([el.images?.rooms, patItem?.images?.rooms, acmeItem?.images?.rooms])
+            rooms: removeDuplicateLinks(mergeDedupe([el.images?.rooms, patItem?.images?.rooms])),
+            site: el.images?.site,
+            amenities: patItem?.images?.amenities 
         };
 
         // remove general amenities if found in room
@@ -234,7 +235,7 @@ const mergeDedupe = (arr: any) => {
     return set.filter(x => x != undefined);
 }
 
-export const removeDuplicates = (arr: string[]) => {
+export const removeDuplicateTags = (arr: string[]) => {
     const seen = new Set();
     const unique : string[] = [];
 
@@ -245,8 +246,19 @@ export const removeDuplicates = (arr: string[]) => {
             unique.push(str);
         }
     }
-
     return unique;
+}
+
+export const removeDuplicateLinks = (arr: { link: string, description: string }[]) => {
+    const seen = new Set<string>();
+    return arr.filter(a => {
+      if (seen.has(a.link)) {
+        return false;
+      } else {
+        seen.add(a.link);
+        return true;
+      }
+    });
 }
 
 export const removeStringsIfPresent = (arr1: string[], arr2: string[]) => {
