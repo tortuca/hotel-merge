@@ -1,4 +1,4 @@
-import { convertSnakeToPascal, convertSnakeToTags, findLongestName, searchHotels, removeDuplicates, removeStringsIfPresent } from "../src/services/merge";
+import { convertPascalToSnake, convertPascalToTags, findLongestName, searchHotels, removeDuplicates, removeStringsIfPresent } from "../src/services/merge";
 
 describe('Get hotels', () => {
     let mockRequest: Partial<Request>;
@@ -39,18 +39,18 @@ describe('Find longest name', () => {
     });
 })
 
-describe('Convert fields', () => {
+describe('Convert PascalCase to snake_case', () => {
     it('DestinationId to destination_id', () => {
-        let conv = convertSnakeToPascal('DestinationId');
+        let conv = convertPascalToSnake('DestinationId');
         expect(conv).toEqual('destination_id');
     });
     it('Name to name', () => {
-        let conv = convertSnakeToPascal('Name');
+        let conv = convertPascalToSnake('Name');
         expect(conv).toEqual('name');
     });
 
     it(' BusinessCenter to business center', () => {
-        let conv = convertSnakeToTags(' BusinessCenter');
+        let conv = convertPascalToTags(' BusinessCenter');
         expect(conv).toEqual('business center');
     });
 });

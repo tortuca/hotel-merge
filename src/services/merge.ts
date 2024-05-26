@@ -174,7 +174,7 @@ const transformAcme = (input: any) => {
         const value = input[key];
         if (!value) continue;
 
-        const newKey = convertSnakeToPascal(key);
+        const newKey = convertPascalToSnake(key);
         output[newKey] = value;
     }
 
@@ -201,7 +201,7 @@ const transformAmenities = (input: any) => {
     if (!amenities) return input;
 
     Object.values(amenities).forEach((name, index) => {
-        input.amenities[index] = convertSnakeToTags(name as string);
+        input.amenities[index] = convertPascalToTags(name as string);
     });
     return input;
 }
@@ -258,10 +258,10 @@ export const findLongestName = (arr: string[]) => {
     return arr.filter(x => x != undefined).reduce((a, b) => a.length < b.length ? b : a, "");
 }
 
-export const convertSnakeToPascal = (input: string) => {
+export const convertPascalToSnake = (input: string) => {
     return input.split(/\.?(?=[A-Z])/).join('_').toLowerCase().trim();
 }
 
-export const convertSnakeToTags = (input: string) => {
+export const convertPascalToTags = (input: string) => {
     return input.split(/\.?(?=[A-Z])/).join(' ').toLowerCase().trim();
 }

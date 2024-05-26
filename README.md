@@ -11,12 +11,12 @@ This is a NodeJS / Express web server that retrieves supplier information about 
 ## Solution
 
 1. Merge hotel data of different suppliers
-    - Standardise and ensure all fields have the same name and format
+    - Download supplier information to disk, and load the merged data into in-app memory and cache (provided source data is reasonably small - less than 500 MB)
     - Create a Hotel object to maintain type and field consistency
 2. Parse and clean dirty data
-    - Remove inconsistent capitalization
-    - Convert snake case to Pascal case
-3. Rules to filter data
+    - Convert PascalCase to snake_case or lower case tags
+    - Standardise and ensure all fields have the same name and format
+3. Rules to represent data
     - Select the longest name, description and address amongst the three suppliers, trusting it provides the most amount of information relevant to the user
     - Extract geocoordinates and city from Patagonia or Acme
     - Combine the amenities data and rename fields for the various suppliers and remove duplicates (after trimming whitespace), where Patagonia amenities refer more to room amenities, and Acme facilties are better suited for general amenities.
@@ -25,13 +25,14 @@ This is a NodeJS / Express web server that retrieves supplier information about 
     - Take booking conditions from Paperflies.
 4. API endpoint that allows us to query the hotels data with some simple filtering
     - Endpoint needs to accept following parameters: destination, hotels
+    - Store search values as cache keys for faster query performance
 
 ### Performance
 1. Data procurement
-    - Fetch the supplier information in parallel - network will take less time to download all the supplier information compared to sequential fetch.
-    - Load the supplier information and transform the data once, then saving the merged data into a cache, so we do not need to make repeated calls to the supplier APIs, and perform multiple merges. We may modify the cache expiry period depending on the update frequency.
+    - Fetch the supplier information in parallel - this will take less time to download all the supplier information over the network compared to sequential fetch.
+    - Load the supplier information and transform the data once, then save the merged data into a cache, so we do not need to make repeated calls to the supplier APIs and perform multiple expensive merges. We may modify the cache expiry period depending on the update frequency.
 2. Data delivery
-    - Merge-on-write, and not merge-on-read so no additional processing is needed for the read queries, and the API endpoint can respond more quickly. 
+    - Merge-on-write, and not merge-on-read so no additional processing is needed for the read queries, and the API endpoint can respond more quickly. This is preferred assuming that frequency of read requests far outweigh any frequency of changes in the source data.
     - When queries are made, save the request parameters and their corresponding responses to a cache. If the query is repeated, we can retrieve the data from the cache, thereby improving response time as we do not need to continuously filter data based on incoming requests.
 
  Note: Improving performance by being considerate to supplier API and reducing response time comes at the cost of potentially stale data, eg when supplier API is updated, it may take X * 2 time (where X = cache expiry) for the new data to be propagated to the client.
@@ -43,7 +44,7 @@ This is a NodeJS / Express web server that retrieves supplier information about 
 Endpoint
 
 ```text
-GET /query?destination=1122
+GET /query[?destination=5432&hotels=fiJhz,SjyX]
 ```
 
 Parameters
@@ -182,7 +183,7 @@ npm run dev
 ### Build
 
 ```
-npm run Build
+npm run build
 ```
 
 ### Start
