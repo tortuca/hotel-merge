@@ -21,7 +21,7 @@ This is a NodeJS / Express web server that retrieves supplier information about 
     - Extract geocoordinates and city from Patagonia or Acme
     - Combine the amenities data and rename fields for the various suppliers and remove duplicates (after trimming whitespace), where Patagonia amenities refer more to room amenities, and Acme facilties are better suited for general amenities.
     - Remove general amenities if they are already present in room amenities for better specificity
-    - Combine the image data and rename fields for the various suppliers and remove duplicates, where Patagonia amenities images are mapped to site images.
+    - Combine the image data fields (rooms, sites, amenities) from Paperflies and Patagonia, and remove duplicate image URLs.
     - Take booking conditions from Paperflies.
 4. API endpoint that allows us to query the hotels data with some simple filtering
     - Endpoint needs to accept following parameters: destination, hotels
@@ -99,19 +99,11 @@ Example output
         "breakfast"
       ]
     },
-    "images": {
+"images": {
       "site": [
         {
           "link": "https://d2ey9sqrvkqdfs.cloudfront.net/0qZF/1.jpg",
           "description": "Front"
-        },
-        {
-          "description": "RWS",
-          "link": "https://d2ey9sqrvkqdfs.cloudfront.net/0qZF/0.jpg"
-        },
-        {
-          "description": "Sentosa Gateway",
-          "link": "https://d2ey9sqrvkqdfs.cloudfront.net/0qZF/6.jpg"
         }
       ],
       "rooms": [
@@ -124,12 +116,18 @@ Example output
           "description": "Double room"
         },
         {
-          "description": "Double room",
-          "link": "https://d2ey9sqrvkqdfs.cloudfront.net/0qZF/2.jpg"
-        },
-        {
           "description": "Bathroom",
           "link": "https://d2ey9sqrvkqdfs.cloudfront.net/0qZF/4.jpg"
+        }
+      ],
+      "amenities": [
+        {
+          "description": "RWS",
+          "link": "https://d2ey9sqrvkqdfs.cloudfront.net/0qZF/0.jpg"
+        },
+        {
+          "description": "Sentosa Gateway",
+          "link": "https://d2ey9sqrvkqdfs.cloudfront.net/0qZF/6.jpg"
         }
       ]
     },
