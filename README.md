@@ -166,6 +166,11 @@ OK
 
 The project requires Node 22. The web server is configured to run on port 3000.
 
+### Install
+```
+npm install
+```
+
 ### Test
 
 ```
