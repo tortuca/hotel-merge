@@ -5,7 +5,7 @@ import path from 'path';
 import { Hotel, ImageUrl } from '../models/hotel.model';
 import { getSuppliers } from './download';
 import { transformPaperflies, transformAcme, transformPatagonia } from './transform';
-import { findLongestName, removeDuplicateTags, removeDuplicateLinks, removeStringsIfPresent, mergeDedupe } from './utility';
+import { findLongestName, removeDuplicateTags, removeDuplicateLinks, removeStringsIfPresent, mergeDedupe } from '../utils/stringOperators';
 
 dotenv.config();
 

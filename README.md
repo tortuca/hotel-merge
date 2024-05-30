@@ -44,7 +44,7 @@ This is a NodeJS / Express web server that retrieves supplier information about 
 Endpoint
 
 ```text
-GET /query[?destination=5432&hotels=fiJhz,SjyX]
+GET /query[?destination=<destination>&hotels=<hotels>]
 ```
 
 Parameters

@@ -20,13 +20,7 @@ export const getSuppliers = async (download: boolean) => {
                 return { data: null, error: `HTTP: ${response.status}` };
             } else {
                 const data = await response.json();
-                let supplier = el.split('/').pop();
-                const filePath = path.resolve(__dirname, '..', '..', 'data', `${supplier}.json`);
-                fs.writeFile(filePath, JSON.stringify(data), (err) => {
-                    if (err) {
-                        console.log(`[error] file: ${err}`);
-                    }
-                });
+                saveToFile(data, el.split('/').pop()!);
                 return { data, error: null };
             }
         }));
@@ -44,6 +38,15 @@ export const testFetch = async () => {
     } catch (error) {
         throw error;
     }
+}
+
+const saveToFile = (data: string, fileName: string) => {
+    const filePath = path.resolve(__dirname, '..', '..', 'data', `${fileName}.json`);
+    fs.writeFile(filePath, JSON.stringify(data), (err) => {
+        if (err) {
+            console.log(`[error] file: ${err}`);
+        }
+    });
 }
 
 export default getSuppliers;
