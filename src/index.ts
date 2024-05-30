@@ -1,7 +1,6 @@
 import express, { Application, Request, Response } from 'express';
 import dotenv from 'dotenv';
 import router from './routes/api';
-import { URLSearchParams } from 'url';
 
 dotenv.config();
 

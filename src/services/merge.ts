@@ -3,7 +3,10 @@ import fs from 'fs';
 import path from 'path';
 
 import { Hotel, ImageUrl } from '../models/hotel.model';
-import cache from './cache';
+import cache from '../db/cache';
+import { getSuppliers } from './download';
+import { convertPascalToSnake, convertPascalToTags, findLongestName, 
+    removeDuplicateTags, removeDuplicateLinks, removeStringsIfPresent, mergeDedupe } from './utility';
 
 dotenv.config();
 
@@ -11,83 +14,10 @@ const suppliers: string[] = (process.env.SUPPLIERS || '').split(',');
 
 /*** Data functions ***/
 
-export const getSuppliers = async (download: boolean) => {
-    if (!download) return {};
-    try {
-        // parallel fetching for all suppliers to speed up performance
-        const responses = await Promise.all(suppliers.map(async (el) => {
-            const response = await fetch(el);
-            console.log('[fetch]', response.status, el);
-            if (!response.ok) {
-                console.log(el, `[error] HTTP: ${response.status}`);
-                return { data: null, error: `HTTP: ${response.status}` };
-            } else {
-                const data = await response.json();
-                let supplier = el.split('/').pop();
-                const filePath = path.resolve(__dirname, '..', '..', 'data', `${supplier}.json`);
-                fs.writeFile(filePath, JSON.stringify(data), (err) => {
-                    if (err) {
-                        console.log(`[error] file: ${err}`);
-                    }
-                });
-                return { data, error: null };
-            }
-        }));
-        return responses;
-    } catch (error) {
-        console.error('[error] unable to fetch suppliers:', error);
-        throw error;
-    }
-}
-
-export const testFetch = async () => {
-    try {
-        const response = await fetch('https://5f2be0b4ffc88500167b85a0.mockapi.io/suppliers/acme');
-        const data = await response.json();
-    } catch (error) {
-        throw error;
-    }
-}
-
-export const filterDestination = (item: any, destination: number) => {
-    return destination === -1 || item.destination === destination;
-}
-
-export const filterHotels = (item: any, hotels: string[]) => {
-    return hotels.length === 0 || hotels.includes(item.id);
-}
-
-export const searchHotels = async (download: boolean, destination: number, hotels: string[]) => {
-    try {
-        const cachedData = cache.get(`${destination}:${hotels}`);
-        if (cachedData) {
-            console.log(`[cache] found ${destination}:${hotels}`);
-            return cachedData;
-        }
-    
-        let data : Hotel[] | undefined = cache.get('all');
-        if (!data) {
-            // save initial download to cache - expires in x minutes
-            data = await loadHotels();
-            cache.set('all', data);
-            console.log(`[cache] saved all data`);
-        }
-
-        const result = data.filter(item => filterDestination(item, destination))
-            .filter(item => filterHotels(item, hotels));
-        cache.set(`${destination}:${hotels}`, result);
-        console.log(`[cache] saved ${destination}:${hotels}`);
-        return result;
-    } catch (error) {
-        console.error('[error] unable to load cache:', error);
-        throw error;
-    }
-}
-
 export const loadHotels = async () => {
     try {
-        const download = (process.env.DOWNLOAD || 'true') === 'true';
-        await getSuppliers(download);
+        const enableDownload = (process.env.ENABLE_DOWNLOAD || 'true') === 'true';
+        await getSuppliers(enableDownload);
         const paperfliesPath = path.resolve(__dirname, '..', '..', 'data', 'paperflies.json');
         const acmePath = path.resolve(__dirname, '..', '..', 'data', 'acme.json');
         const patagoniaPath = path.resolve(__dirname, '..', '..', 'data', 'patagonia.json');
@@ -102,7 +32,6 @@ export const loadHotels = async () => {
         const paperfliesJson = JSON.parse(paperfliesData);
         const acmeJson = JSON.parse(acmeData);
         const patagoniaJson = JSON.parse(patagoniaData);
-
         return mergeSuppliers(paperfliesJson, acmeJson, patagoniaJson);
     } catch (error) {
         console.error('[error] unable to load files:', error);
@@ -226,54 +155,4 @@ const transformImages = (input: any) => {
         }
     }
     return input;
-}
-
-/*** Utility functions ***/
-
-const mergeDedupe = (arr: any) => {
-    let set = [...new Set([].concat(...arr))];
-    return set.filter(x => x != undefined);
-}
-
-export const removeDuplicateTags = (arr: string[]) => {
-    const seen = new Set();
-    const unique : string[] = [];
-
-    for (const str of arr) {
-        const normalizedStr = str.replace(/\s+/g, '');
-        if (!seen.has(normalizedStr)) {
-            seen.add(normalizedStr);
-            unique.push(str);
-        }
-    }
-    return unique;
-}
-
-export const removeDuplicateLinks = (arr: { link: string, description: string }[]) => {
-    const seen = new Set<string>();
-    return arr.filter(a => {
-      if (seen.has(a.link)) {
-        return false;
-      } else {
-        seen.add(a.link);
-        return true;
-      }
-    });
-}
-
-export const removeStringsIfPresent = (arr1: string[], arr2: string[]) => {
-    const remove = new Set(arr2.map(str => str.replace(/\s+/g, '')));
-    return arr1.filter(str => !remove.has(str.replace(/\s+/g, '')));
-}
-
-export const findLongestName = (arr: string[]) => {
-    return arr.filter(x => x != undefined).reduce((a, b) => a.length < b.length ? b : a, "");
-}
-
-export const convertPascalToSnake = (input: string) => {
-    return input.split(/\.?(?=[A-Z])/).join('_').toLowerCase().trim();
-}
-
-export const convertPascalToTags = (input: string) => {
-    return input.split(/\.?(?=[A-Z])/).join(' ').toLowerCase().trim();
 }

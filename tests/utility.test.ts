@@ -1,17 +1,5 @@
-import { convertPascalToSnake, convertPascalToTags, findLongestName, searchHotels, removeDuplicateTags, removeStringsIfPresent } from "../src/services/merge";
-
-describe('Get hotels', () => {
-    let mockRequest: Partial<Request>;
-    let mockResponse: Partial<Response>;
-    let responseStatus: jest.Mock;
-    let responseSend: jest.Mock;
-    
-    it('responds with 200', async () => {
-        let response = await searchHotels(false, 0, ['']);
-        expect(response).toBeDefined();
-    });
-});
-
+import { removeDuplicateTags, removeStringsIfPresent, findLongestName, 
+    convertPascalToSnake, convertPascalToTags } from '../src/services/utility';
 
 describe('Remove duplicates and strings if present ', () => {
     it('Pool, Pool, Breakfast, Gym', () => {

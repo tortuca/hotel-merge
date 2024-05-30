@@ -1,5 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { searchHotels, getSuppliers, testFetch } from '../services/merge';
+import { getSuppliers, testFetch } from '../services/download';
+import { searchHotels } from '../services/search';
 
 const router: Router = Router();
 
@@ -24,8 +25,8 @@ router.get('/query', async (req: Request, res: Response, next: NextFunction) => 
                 return;
             }
         }
-        const download = (process.env.DOWNLOAD || 'true') === 'true';
-        res.status(200).json(await searchHotels(download, destinationQ, hotelsQ));
+        const enableDownload = (process.env.ENABLE_DOWNLOAD || 'true') === 'true';
+        res.status(200).json(await searchHotels(enableDownload, destinationQ, hotelsQ));
         return res;
     } catch (err) {
         res.status(500).send();
