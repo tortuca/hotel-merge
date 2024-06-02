@@ -33,6 +33,7 @@ This is a NodeJS / Express web server that retrieves supplier information about 
     - Load the supplier information and transform the data once, then save the merged data into database, so we do not need to make repeated calls to the supplier APIs and perform multiple expensive merges. We may modify the data procurement interval depending on the update frequency.
 2. Data delivery
     - Merge-on-write, and not merge-on-read so no additional processing is needed for the read queries, and the API endpoint can respond more quickly. This is preferred assuming that frequency of read requests far outweigh any frequency of changes in the source data.
+    - Create indexes on the hotel data for destination and hotel IDs so that a lookup is O(1).
     - When queries are made, save the request parameters and their corresponding responses to a cache. If the query is repeated, we can retrieve the data from the cache, thereby improving response time as we do not need to continuously filter data based on incoming requests.
 
  Note: Improving performance by being considerate to supplier API and reducing response time comes at the cost of potentially stale data, eg when supplier API is updated, it may take more time for the new data to be propagated to the client.

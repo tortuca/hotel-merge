@@ -18,11 +18,6 @@ afterAll(async () => {
 })
 
 describe('Get hotels', () => {
-    let mockRequest: Partial<Request>;
-    let mockResponse: Partial<Response>;
-    let responseStatus: jest.Mock;
-    let responseSend: jest.Mock;
-
     it('responds with 200', async () => {
         const hotels = hotelService.hotelRepository;
         hotels.findHotels = jest.fn().mockReturnValue([
