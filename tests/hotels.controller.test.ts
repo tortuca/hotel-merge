@@ -13,6 +13,10 @@ afterEach(() => {
     jest.clearAllMocks();
 })
 
+afterAll(async () => {
+    await mongoose.disconnect();
+})
+
 describe('Get hotels', () => {
     let mockRequest: Partial<Request>;
     let mockResponse: Partial<Response>;

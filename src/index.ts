@@ -4,8 +4,8 @@ import mongoose from 'mongoose';
 import router from './routes/api';
 
 import HotelRepository from './modules/hotels/hotels.repository';
+import SupplierRepository from './modules/suppliers/suppliers.repository';
 import SupplierService from './modules/suppliers/suppliers.service';
-import { SupplierModel, initSupplierDb } from './modules/suppliers/suppliers.model';
 
 dotenv.config();
 
@@ -37,8 +37,9 @@ async function importData() {
     await connectDb();
     const hotelRepository: HotelRepository = new HotelRepository();
     await hotelRepository.initHotelDb();
-    await initSupplierDb();
 
+    const supplierRepository: SupplierRepository = new SupplierRepository();
+    await supplierRepository.initSupplierDb();
     const supplierService: SupplierService = new SupplierService();
     await supplierService.importSupplierData(enableDownload);
 }

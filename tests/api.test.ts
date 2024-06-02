@@ -19,8 +19,13 @@ beforeAll(async () => {
     await mongoose.connect(MONGO_URL);
     mongoose.connection.on('error', (error: Error) => console.log(error));
 })
+
 afterEach(() => {
     jest.clearAllMocks();
+})
+
+afterAll(async () => {
+    await mongoose.disconnect();
 })
 
 describe('Health', () => {

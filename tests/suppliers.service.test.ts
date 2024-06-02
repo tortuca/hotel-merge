@@ -7,6 +7,10 @@ beforeAll(async () => {
     mongoose.connection.on('error', (error: Error) => console.log(error));
 })
 
+afterAll(async () => {
+    await mongoose.disconnect();
+})
+
 describe('Get suppliers', () => {
     let mockRequest: Partial<Request>;
     let mockResponse: Partial<Response>;

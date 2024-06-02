@@ -4,8 +4,8 @@ import path from 'path';
 import cache from '../hotels/cache';
 
 import HotelRepository from '../hotels/hotels.repository';
+import SupplierRepository from '../suppliers/suppliers.repository';
 import { Hotel } from '../hotels/hotels.interface';
-import { getDataBySupplier, saveDataBySupplier } from './suppliers.model';
 import { transformPaperflies, transformAcme, transformPatagonia } from '../utils/transform';
 import { findLongestName, removeDuplicateTags, removeDuplicateLinks, removeStringsIfPresent, mergeDedupe } from '../utils/stringOperators';
 
@@ -13,6 +13,7 @@ dotenv.config();
 
 const suppliers: string[] = (process.env.SUPPLIERS || '').split(',');
 const hotelRepository: HotelRepository = new HotelRepository();
+const supplierRepository: SupplierRepository = new SupplierRepository();
 
 class SupplierService {
 
@@ -51,9 +52,9 @@ class SupplierService {
     public async loadHotelsToDb(): Promise<Hotel[]> {
         try {
             // Parse JSON after reading all files
-            const paperfliesData = await getDataBySupplier('paperflies');
-            const acmeData = await getDataBySupplier('acme');
-            const patagoniaData = await getDataBySupplier('patagonia');
+            const paperfliesData = await supplierRepository.getDataBySupplier('paperflies');
+            const acmeData = await supplierRepository.getDataBySupplier('acme');
+            const patagoniaData = await supplierRepository.getDataBySupplier('patagonia');
     
             const paperfliesJson = JSON.parse(paperfliesData?.data!);
             const acmeJson = JSON.parse(acmeData?.data!);
@@ -118,7 +119,7 @@ class SupplierService {
     }
 
     public async saveToDb(supplier: string, data: string): Promise<void> {
-        saveDataBySupplier(supplier, JSON.stringify(data));
+        supplierRepository.saveDataBySupplier(supplier, JSON.stringify(data));
     }
 
     public async saveToFile(supplier: string, data: string): Promise<void> {

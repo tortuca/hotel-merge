@@ -7,19 +7,19 @@ class HotelRepository {
     public hotels = HotelModel;
 
     public async findHotels(): Promise<Hotel[]> {
-         return HotelModel.find({}, hideFields);
+         return await this.hotels.find({}, hideFields);
     }; 
 
     public async findHotelsByDestination(dest: number): Promise<Hotel[]> {
-        return await HotelModel.find({destination: dest}, hideFields);
+        return await this.hotels.find({destination: dest}, hideFields);
     }
 
     public async getHotelByHotelId(hotel_id: string): Promise<Hotel | null> {
-        return (await HotelModel.findOne({id : hotel_id}, hideFields)) || null;
+        return (await this.hotels.findOne({id : hotel_id}, hideFields)) || null;
     }
 
     public async findHotelsByHotelIds(hotel_ids: string[]): Promise<Hotel[]> {
-        return await HotelModel.find({
+        return await this.hotels.find({
             id : { 
                 $in: hotel_ids
             }
@@ -27,7 +27,7 @@ class HotelRepository {
     }
 
     public async findHotelsByDestinationAndHotelIds(dest: number, hotel_ids: string[]): Promise<Hotel[]> {
-        return await HotelModel.find({
+        return await this.hotels.find({
             destination: dest, 
             id : { 
                 $in: hotel_ids
@@ -36,11 +36,11 @@ class HotelRepository {
     }
 
     public async saveHotels(hotels: Hotel[]): Promise<Hotel[]> {
-        return await HotelModel.insertMany(hotels);
+        return await this.hotels.insertMany(hotels);
     }
 
     public async upsertHotels(hotels: Hotel[]): Promise<any> {
-        const response = await HotelModel.bulkWrite(hotels.map(h => ({
+        const response = await this.hotels.bulkWrite(hotels.map(h => ({
             updateOne: {
                 filter: { id: h.id },
                 update: { $set: h },
@@ -51,7 +51,7 @@ class HotelRepository {
 
     public async initHotelDb(): Promise<any> {
         try {
-            let collection = await HotelModel.createCollection();
+            let collection = await this.hotels.createCollection();
             console.log('[db]: hotel collection created');
             collection.createIndex( { destination : -1 } );
             collection.createIndex( { id : -1 } );
