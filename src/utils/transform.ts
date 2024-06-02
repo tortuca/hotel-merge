@@ -1,4 +1,4 @@
-import { convertPascalToSnake, convertPascalToTags } from '../utils/stringOperators';
+import { convertPascalToSnake, convertPascalToTags } from './stringOperators';
 
 export const transformPaperflies = (input: any) => {
     const output = {

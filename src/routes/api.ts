@@ -1,8 +1,10 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { getSuppliers, testFetch } from '../services/download';
-import { searchHotels } from '../services/search';
+import SuppliersService from '../suppliers/suppliers.service';
+import HotelsController from '../hotels/hotels.controller';
 
 const router: Router = Router();
+const hotelsController: HotelsController = new HotelsController();
+const suppliersService: SuppliersService = new SuppliersService();
 
 router.get('/health', async (req: Request, res: Response) => {
     // res.status(200).json(await testFetch());
@@ -25,8 +27,8 @@ router.get('/query', async (req: Request, res: Response, next: NextFunction) => 
                 return;
             }
         }
-        const enableDownload = (process.env.ENABLE_DOWNLOAD || 'true') === 'true';
-        res.status(200).json(await searchHotels(enableDownload, destinationQ, hotelsQ));
+        // const enableDownload = (process.env.ENABLE_DOWNLOAD || 'true') === 'true';
+        res.status(200).json(await hotelsController.searchHotels(destinationQ, hotelsQ));
         return res;
     } catch (err) {
         res.status(500).send();
@@ -34,9 +36,9 @@ router.get('/query', async (req: Request, res: Response, next: NextFunction) => 
     }
 })
 
-router.get('/suppliers', async (req: Request, res: Response, next: NextFunction) => {
+router.post('/suppliers', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        res.status(200).json(await getSuppliers(true));
+        res.status(200).json(await suppliersService.importSupplierData());
     } catch (err) {
         return next(err);
     }

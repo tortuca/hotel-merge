@@ -2,23 +2,19 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import router from '../src/routes/api';
 import request from 'supertest';
+import HotelsController from '../src/hotels/hotels.controller';
+import SupplierService from '../src/suppliers/suppliers.service';
 
 const app = express();
 app.use(bodyParser.json());
 app.use(router);
-
-// jest.mock('../../services/merge');
+    
+const hotelsController = new HotelsController();
+const supplierService = new SupplierService();
 
 afterEach(() => {
     jest.clearAllMocks();
 })
-
-// describe('Suppliers', () => {
-//     it('Get suppliers', async () => {
-//         const response = await request(app).get('/suppliers').send();
-//         expect(response.status).toBe(200);
-//     });
-// });
 
 describe('Health', () => {
     it('health', async () => {
@@ -29,7 +25,21 @@ describe('Health', () => {
 });
 
 describe('Hotel Query', () => {
+    const hotels = hotelsController.hotelService;
     it('Get destination=5432', async () => {
+        hotels.findHotelsByDestination = jest.fn().mockReturnValue([
+            {
+              id: 'abc2',
+              destination: 5432,
+              name: 'test',
+            },
+            {
+              id: 'xyz3',
+              destination: 5432,
+              name: 'test2',
+            }
+        ]);
+
         const response = await request(app).get('/query?destination=5432').send();
         expect(response.status).toBe(200);
         expect(response.body).toBeDefined();

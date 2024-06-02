@@ -65,7 +65,7 @@ $ curl "http://localhost:3000/query?destination=5432&hotels=iJhz,SjyX"
 Example output
 
 ```
-
+[
   {
     "id": "iJhz",
     "destination": 5432,
