@@ -2,7 +2,7 @@ import cache, { isCacheStale } from './cache';
 import HotelRepository from './hotels.repository';
 import SupplierService from '../suppliers/suppliers.service';
 
-class HotelsController {
+class HotelService {
     public hotelService = new HotelRepository();
     public supplierService = new SupplierService();
 
@@ -46,4 +46,4 @@ class HotelsController {
     }
 }
 
-export default HotelsController;
+export default HotelService;

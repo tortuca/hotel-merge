@@ -1,9 +1,9 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import SuppliersService from '../modules/suppliers/suppliers.service';
-import HotelsController from '../modules/hotels/hotels.controller';
+import HotelService from '../modules/hotels/hotels.service';
 
 const router: Router = Router();
-const hotelsController: HotelsController = new HotelsController();
+const hotelsController: HotelService = new HotelService();
 const suppliersService: SuppliersService = new SuppliersService();
 
 router.get('/health', async (req: Request, res: Response) => {

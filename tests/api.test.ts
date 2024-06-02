@@ -4,14 +4,14 @@ import router from '../src/routes/api';
 import request from 'supertest';
 import mongoose from 'mongoose';
 
-import HotelsController from '../src/modules/hotels/hotels.controller';
+import HotelService from '../src/modules/hotels/hotels.service';
 import SupplierService from '../src/modules/suppliers/suppliers.service';
 
 const app = express();
 app.use(bodyParser.json());
 app.use(router);
     
-const hotelsController = new HotelsController();
+const hotelsController = new HotelService();
 const supplierService = new SupplierService();
 
 beforeAll(async () => {

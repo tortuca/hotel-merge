@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
-import HotelsController from '../src/modules/hotels/hotels.controller';
+import HotelService from '../src/modules/hotels/hotels.service';
     
-const hotelsController = new HotelsController();
+const hotelsController = new HotelService();
 
 beforeAll(async () => {
     const MONGO_URL = process.env.MONGO_URL || '';
