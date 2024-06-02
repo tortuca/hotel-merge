@@ -1,6 +1,13 @@
+import mongoose from 'mongoose';
 import HotelsController from '../src/modules/hotels/hotels.controller';
     
 const hotelsController = new HotelsController();
+
+beforeAll(async () => {
+    const MONGO_URL = process.env.MONGO_URL || '';
+    await mongoose.connect(MONGO_URL);
+    mongoose.connection.on('error', (error: Error) => console.log(error));
+})
 
 afterEach(() => {
     jest.clearAllMocks();

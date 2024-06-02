@@ -2,6 +2,8 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import router from '../src/routes/api';
 import request from 'supertest';
+import mongoose from 'mongoose';
+
 import HotelsController from '../src/modules/hotels/hotels.controller';
 import SupplierService from '../src/modules/suppliers/suppliers.service';
 
@@ -12,6 +14,11 @@ app.use(router);
 const hotelsController = new HotelsController();
 const supplierService = new SupplierService();
 
+beforeAll(async () => {
+    const MONGO_URL = process.env.MONGO_URL || '';
+    await mongoose.connect(MONGO_URL);
+    mongoose.connection.on('error', (error: Error) => console.log(error));
+})
 afterEach(() => {
     jest.clearAllMocks();
 })

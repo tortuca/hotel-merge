@@ -1,4 +1,11 @@
+import mongoose from 'mongoose';
 import SuppliersService from '../src/modules/suppliers/suppliers.service';
+
+beforeAll(async () => {
+    const MONGO_URL = process.env.MONGO_URL || '';
+    await mongoose.connect(MONGO_URL);
+    mongoose.connection.on('error', (error: Error) => console.log(error));
+})
 
 describe('Get suppliers', () => {
     let mockRequest: Partial<Request>;
