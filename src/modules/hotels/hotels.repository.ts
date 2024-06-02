@@ -1,9 +1,9 @@
-import { HotelModel } from "./hotels.model";
-import { Hotel } from "./hotels.interface";
+import { Hotel } from './hotels.interface';
+import { HotelModel } from './hotels.model';
 
 const hideFields = { '_id': 0, '__v': 0 };
 
-class HotelService {
+class HotelRepository {
     public hotels = HotelModel;
 
     public async findHotels(): Promise<Hotel[]> {
@@ -62,4 +62,4 @@ class HotelService {
     }
 }
 
-export default HotelService;
+export default HotelRepository;

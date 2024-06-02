@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import SuppliersService from '../suppliers/suppliers.service';
-import HotelsController from '../hotels/hotels.controller';
+import SuppliersService from '../modules/suppliers/suppliers.service';
+import HotelsController from '../modules/hotels/hotels.controller';
 
 const router: Router = Router();
 const hotelsController: HotelsController = new HotelsController();
@@ -38,7 +38,8 @@ router.get('/query', async (req: Request, res: Response, next: NextFunction) => 
 
 router.post('/suppliers', async (req: Request, res: Response, next: NextFunction) => {
     try {
-        res.status(200).json(await suppliersService.importSupplierData());
+        const enableDownload = (process.env.ENABLE_DOWNLOAD || 'true') === 'true';
+        res.status(200).json(await suppliersService.importSupplierData(enableDownload));
     } catch (err) {
         return next(err);
     }

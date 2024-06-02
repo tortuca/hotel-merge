@@ -2,8 +2,8 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import router from '../src/routes/api';
 import request from 'supertest';
-import HotelsController from '../src/hotels/hotels.controller';
-import SupplierService from '../src/suppliers/suppliers.service';
+import HotelsController from '../src/modules/hotels/hotels.controller';
+import SupplierService from '../src/modules/suppliers/suppliers.service';
 
 const app = express();
 app.use(bodyParser.json());

@@ -1,24 +1,30 @@
 import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
+import cache from '../hotels/cache';
+
+import HotelRepository from '../hotels/hotels.repository';
 import { Hotel } from '../hotels/hotels.interface';
 import { getDataBySupplier, saveDataBySupplier } from './suppliers.model';
 import { transformPaperflies, transformAcme, transformPatagonia } from '../utils/transform';
 import { findLongestName, removeDuplicateTags, removeDuplicateLinks, removeStringsIfPresent, mergeDedupe } from '../utils/stringOperators';
-import HotelService from '../hotels/hotels.service';
 
 dotenv.config();
 
 const suppliers: string[] = (process.env.SUPPLIERS || '').split(',');
-const hotelService: HotelService = new HotelService();
+const hotelRepository: HotelRepository = new HotelRepository();
 
 class SupplierService {
 
-    public async importSupplierData(): Promise<any> {
-        await this.downloadSuppliers(true);
+    public async importSupplierData(enableDownload: boolean): Promise<any> {
+        await this.downloadSuppliers(enableDownload);
         await this.loadHotelsToDb();
+
+        const now = Date.now();
+        cache.set('update', now);
+        console.log(`[cache] newest load and merge = ${now}`);
     }
-    
+
     public async downloadSuppliers(download: boolean): Promise<any> {
         if (!download) return {};
         try {
@@ -54,7 +60,7 @@ class SupplierService {
             const patagoniaJson = JSON.parse(patagoniaData?.data!);
     
             const hotels = await this.mergeSuppliers(paperfliesJson, acmeJson, patagoniaJson);
-            const saved = await hotelService.upsertHotels(hotels);
+            const saved = await hotelRepository.upsertHotels(hotels);
             return saved;
         } catch (error) {
             console.error('[error] unable to load files:', error);

@@ -1,5 +1,5 @@
 import { removeDuplicateTags, removeStringsIfPresent, findLongestName, 
-    convertPascalToSnake, convertPascalToTags } from '../src/utils/stringOperators';
+    convertPascalToSnake, convertPascalToTags } from '../src/modules/utils/stringOperators';
 
 describe('Remove duplicates and strings if present ', () => {
     it('Pool, Pool, Breakfast, Gym', () => {

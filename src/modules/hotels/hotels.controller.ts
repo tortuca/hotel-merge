@@ -1,9 +1,9 @@
-import cache from './cache';
-import HotelService from './hotels.service';
+import cache, { isCacheStale } from './cache';
+import HotelRepository from './hotels.repository';
 import SupplierService from '../suppliers/suppliers.service';
 
 class HotelsController {
-    public hotelService = new HotelService();
+    public hotelService = new HotelRepository();
     public supplierService = new SupplierService();
 
     public searchHotels = async ( destination: number, hotels: string[] ) => {
@@ -17,16 +17,13 @@ class HotelsController {
             const now : number = Date.now();
 
             let lastUpdatedAt = cache.get('update');
-            if (!lastUpdatedAt) {
+            console.log(`[cache] last load and merge = ${lastUpdatedAt}`);
+            if (!lastUpdatedAt || isCacheStale(now, Number(lastUpdatedAt))) {
                 // perform load and merge if not updated recently
-                await this.supplierService.loadHotelsToDb();
-                cache.set('update', now);
-                console.log(`[cache] last load and merge = ${now}`);
-            } else {
-                // if ((now - lastUpdatedAt) > 5 * 60 * 1000) {
-                //     console.log('test');
-                // }
+                const enableDownload = (process.env.ENABLE_DOWNLOAD || 'true') === 'true';
+                await this.supplierService.importSupplierData(enableDownload);
             }
+            
             let result;
             if (destination !== -1) {
                 let test = this.hotelService.findHotelsByDestination(destination);

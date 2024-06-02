@@ -1,4 +1,4 @@
-import HotelsController from '../src/hotels/hotels.controller';
+import HotelsController from '../src/modules/hotels/hotels.controller';
     
 const hotelsController = new HotelsController();
 

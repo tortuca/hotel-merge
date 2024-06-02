@@ -1,4 +1,4 @@
-import SuppliersService from '../src/suppliers/suppliers.service';
+import SuppliersService from '../src/modules/suppliers/suppliers.service';
 
 describe('Get suppliers', () => {
     let mockRequest: Partial<Request>;
