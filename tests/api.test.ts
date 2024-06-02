@@ -5,14 +5,12 @@ import request from 'supertest';
 import mongoose from 'mongoose';
 
 import HotelService from '../src/modules/hotels/hotels.service';
-import SupplierService from '../src/modules/suppliers/suppliers.service';
 
 const app = express();
 app.use(bodyParser.json());
 app.use(router);
     
-const hotelsController = new HotelService();
-const supplierService = new SupplierService();
+const hotelService = new HotelService();
 
 beforeAll(async () => {
     const MONGO_URL = process.env.MONGO_URL || '';
@@ -37,7 +35,7 @@ describe('Health', () => {
 });
 
 describe('Hotel Query', () => {
-    const hotels = hotelsController.hotelService;
+    const hotels = hotelService.hotelRepository;
     it('Get destination=5432', async () => {
         hotels.findHotelsByDestination = jest.fn().mockReturnValue([
             {

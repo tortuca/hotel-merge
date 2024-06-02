@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import HotelService from '../src/modules/hotels/hotels.service';
     
-const hotelsController = new HotelService();
+const hotelService = new HotelService();
 
 beforeAll(async () => {
     const MONGO_URL = process.env.MONGO_URL || '';
@@ -24,7 +24,7 @@ describe('Get hotels', () => {
     let responseSend: jest.Mock;
 
     it('responds with 200', async () => {
-        const hotels = hotelsController.hotelService;
+        const hotels = hotelService.hotelRepository;
         hotels.findHotels = jest.fn().mockReturnValue([
             {
               id: 'abc2',
@@ -32,7 +32,7 @@ describe('Get hotels', () => {
               name: 'test',
             },
         ]);
-        let response = await hotelsController.searchHotels(-1, []);
+        let response = await hotelService.searchHotels(-1, []);
         expect(response).toBeDefined();
     });
 });

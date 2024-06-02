@@ -3,7 +3,7 @@ import SuppliersService from '../modules/suppliers/suppliers.service';
 import HotelService from '../modules/hotels/hotels.service';
 
 const router: Router = Router();
-const hotelsController: HotelService = new HotelService();
+const hotelsService: HotelService = new HotelService();
 const suppliersService: SuppliersService = new SuppliersService();
 
 router.get('/health', async (req: Request, res: Response) => {
@@ -28,7 +28,7 @@ router.get('/query', async (req: Request, res: Response, next: NextFunction) => 
             }
         }
         // const enableDownload = (process.env.ENABLE_DOWNLOAD || 'true') === 'true';
-        res.status(200).json(await hotelsController.searchHotels(destinationQ, hotelsQ));
+        res.status(200).json(await hotelsService.searchHotels(destinationQ, hotelsQ));
         return res;
     } catch (err) {
         res.status(500).send();

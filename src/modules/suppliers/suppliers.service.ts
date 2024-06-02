@@ -4,6 +4,7 @@ import path from 'path';
 import cache from '../hotels/cache';
 
 import HotelRepository from '../hotels/hotels.repository';
+import HotelService from '../hotels/hotels.service';
 import SupplierRepository from '../suppliers/suppliers.repository';
 import { Hotel } from '../hotels/hotels.interface';
 import { transformPaperflies, transformAcme, transformPatagonia } from '../utils/transform';
@@ -12,10 +13,15 @@ import { findLongestName, removeDuplicateTags, removeDuplicateLinks, removeStrin
 dotenv.config();
 
 const suppliers: string[] = (process.env.SUPPLIERS || '').split(',');
-const hotelRepository: HotelRepository = new HotelRepository();
-const supplierRepository: SupplierRepository = new SupplierRepository();
 
 class SupplierService {
+    public hotelRepository: HotelRepository;
+    public supplierRepository: SupplierRepository;
+
+    constructor() {
+        this.hotelRepository = new HotelRepository();
+        this.supplierRepository = new SupplierRepository();
+    }
 
     public async importSupplierData(enableDownload: boolean): Promise<any> {
         await this.downloadSuppliers(enableDownload);
@@ -52,16 +58,16 @@ class SupplierService {
     public async loadHotelsToDb(): Promise<Hotel[]> {
         try {
             // Parse JSON after reading all files
-            const paperfliesData = await supplierRepository.getDataBySupplier('paperflies');
-            const acmeData = await supplierRepository.getDataBySupplier('acme');
-            const patagoniaData = await supplierRepository.getDataBySupplier('patagonia');
+            const paperfliesData = await this.supplierRepository.getDataBySupplier('paperflies');
+            const acmeData = await this.supplierRepository.getDataBySupplier('acme');
+            const patagoniaData = await this.supplierRepository.getDataBySupplier('patagonia');
     
             const paperfliesJson = JSON.parse(paperfliesData?.data!);
             const acmeJson = JSON.parse(acmeData?.data!);
             const patagoniaJson = JSON.parse(patagoniaData?.data!);
     
             const hotels = await this.mergeSuppliers(paperfliesJson, acmeJson, patagoniaJson);
-            const saved = await hotelRepository.upsertHotels(hotels);
+            const saved = await this.hotelRepository.upsertHotels(hotels);
             return saved;
         } catch (error) {
             console.error('[error] unable to load files:', error);
@@ -119,7 +125,7 @@ class SupplierService {
     }
 
     public async saveToDb(supplier: string, data: string): Promise<void> {
-        supplierRepository.saveDataBySupplier(supplier, JSON.stringify(data));
+        this.supplierRepository.saveDataBySupplier(supplier, JSON.stringify(data));
     }
 
     public async saveToFile(supplier: string, data: string): Promise<void> {
