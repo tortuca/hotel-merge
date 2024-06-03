@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import SuppliersService from '../src/modules/suppliers/suppliers.service';
+import SupplierService from '../src/modules/suppliers/suppliers.service';
 
 beforeAll(async () => {
     const MONGO_URL = process.env.MONGO_URL || '';
@@ -12,15 +12,10 @@ afterAll(async () => {
 })
 
 describe('Get suppliers', () => {
-    let mockRequest: Partial<Request>;
-    let mockResponse: Partial<Response>;
-    let responseStatus: jest.Mock;
-    let responseSend: jest.Mock;
-    
-    const suppliersService = new SuppliersService();
+    const supplierService = new SupplierService();
 
     it('responds with 200', async () => {
-        let response = await suppliersService.downloadSuppliers(false);
+        let response = await supplierService.downloadSuppliers(false);
         expect(response).toBeDefined();
     });
 });

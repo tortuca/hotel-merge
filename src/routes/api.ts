@@ -1,10 +1,10 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import SuppliersService from '../modules/suppliers/suppliers.service';
+import SupplierService from '../modules/suppliers/suppliers.service';
 import HotelService from '../modules/hotels/hotels.service';
 
 const router: Router = Router();
-const hotelsService: HotelService = new HotelService();
-const suppliersService: SuppliersService = new SuppliersService();
+const hotelService: HotelService = new HotelService();
+const supplierService: SupplierService = new SupplierService();
 
 router.get('/health', async (req: Request, res: Response) => {
     // res.status(200).json(await testFetch());
@@ -28,7 +28,7 @@ router.get('/query', async (req: Request, res: Response, next: NextFunction) => 
             }
         }
         // const enableDownload = (process.env.ENABLE_DOWNLOAD || 'true') === 'true';
-        res.status(200).json(await hotelsService.searchHotels(destinationQ, hotelsQ));
+        res.status(200).json(await hotelService.searchHotels(destinationQ, hotelsQ));
         return res;
     } catch (err) {
         res.status(500).send();
@@ -39,7 +39,7 @@ router.get('/query', async (req: Request, res: Response, next: NextFunction) => 
 router.post('/suppliers', async (req: Request, res: Response, next: NextFunction) => {
     try {
         const enableDownload = (process.env.ENABLE_DOWNLOAD || 'true') === 'true';
-        res.status(200).json(await suppliersService.importSupplierData(enableDownload));
+        res.status(200).json(await supplierService.importSupplierData(enableDownload));
     } catch (err) {
         return next(err);
     }
