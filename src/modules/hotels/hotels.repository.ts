@@ -39,7 +39,7 @@ class HotelRepository {
         return await this.hotels.insertMany(hotels);
     }
 
-    public async upsertHotels(hotels: IHotel[]): Promise<any> {
+    public async upsertHotels(hotels: IHotel[]): Promise<IHotel[]> {
         try {
             const response = await this.hotels.bulkWrite(hotels.map(h => ({
                 updateOne: {
@@ -48,6 +48,7 @@ class HotelRepository {
                     upsert: true,
                 }
             })));
+            return hotels;
         } catch (error) {
             console.error('[error] unable to save data:', error);
             throw error;

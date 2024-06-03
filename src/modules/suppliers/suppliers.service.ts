@@ -23,12 +23,18 @@ class SupplierService {
     }
 
     public async importSupplierData(enableDownload: boolean): Promise<any> {
-        await this.downloadSuppliers(enableDownload);
-        await this.loadHotelsToDb();
+        try {
+            const data = await this.downloadSuppliers(enableDownload);
+            const hotels = await this.loadHotelsToDb();
 
-        const now = Date.now();
-        cache.set('update', now);
-        console.log(`[cache] newest load and merge = ${(new Date(now)).toISOString()}`);
+            const now = Date.now();
+            cache.set('update', now);
+            console.log(`[cache] newest load and merge = ${(new Date(now)).toISOString()}`);
+            return hotels; 
+        } catch (error) {
+            console.error('[error] unable to import suppliers:', error);
+            throw error;
+        }
     }
 
     public async downloadSuppliers(download: boolean): Promise<any> {
@@ -43,7 +49,7 @@ class SupplierService {
                     return { data: null, error: `HTTP: ${response.status}` };
                 } else {
                     const data = await response.json();
-                    this.saveToDb(el.split('/').pop()!, data);
+                    await this.saveToDb(el.split('/').pop()!, data);
                     return { data, error: null };
                 }
             }));

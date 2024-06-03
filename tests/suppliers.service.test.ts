@@ -1,5 +1,8 @@
 import mongoose from 'mongoose';
+import dotenv from 'dotenv';
 import SupplierService from '../src/modules/suppliers/suppliers.service';
+
+dotenv.config();
 
 beforeAll(async () => {
     const MONGO_URL = process.env.MONGO_URL || '';
@@ -13,9 +16,10 @@ afterAll(async () => {
 
 describe('Get suppliers', () => {
     const supplierService = new SupplierService();
+    const enableDownload = (process.env.ENABLE_DOWNLOAD || 'true') === 'true';
 
     it('responds with 200', async () => {
-        let response = await supplierService.downloadSuppliers(false);
+        let response = await supplierService.importSupplierData(enableDownload);
         expect(response).toBeDefined();
     });
 });
