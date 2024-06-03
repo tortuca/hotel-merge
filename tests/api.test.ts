@@ -1,9 +1,10 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import router from '../src/routes/api';
 import request from 'supertest';
 import mongoose from 'mongoose';
+import router from '../src/routes/api';
 
+import cache from '../src/modules/utils/cache';
 import HotelService from '../src/modules/hotels/hotels.service';
 
 const app = express();
@@ -17,7 +18,8 @@ beforeAll(async () => {
     await mongoose.connect(MONGO_URL);
     mongoose.connection.on('error', (error: Error) => console.log(error));
 
-    jest.setTimeout(10000);
+    const now = Date.now();
+    cache.set('update', now);
 })
 
 afterEach(() => {

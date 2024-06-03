@@ -1,7 +1,8 @@
 import cache, { isCacheStale } from '../utils/cache';
+import { triggerDownload } from '../utils/cron';
+
 import HotelRepository from './hotels.repository';
 import { IHotel } from './hotels.interface';
-import { triggerDownload } from '../utils/cron';
 
 class HotelService {
     public hotelRepository: HotelRepository;

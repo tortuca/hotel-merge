@@ -4,6 +4,7 @@
 - Refactor for cleaner separation of functionalities
 - Use MongoDB to store supplier data instead of file and cache
 - Add database index for destination and hotel lookup
+- Add cron job for every 5 minutes data procurement
 
 ### 2024-05-26
 - Import supplier data, merge and transform according to data rules

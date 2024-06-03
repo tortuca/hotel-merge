@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import cache from '../src/modules/utils/cache';
 import HotelService from '../src/modules/hotels/hotels.service';
     
 const hotelService = new HotelService();
@@ -7,6 +8,9 @@ beforeAll(async () => {
     const MONGO_URL = process.env.MONGO_URL || '';
     await mongoose.connect(MONGO_URL);
     mongoose.connection.on('error', (error: Error) => console.log(error));
+
+    const now = Date.now();
+    cache.set('update', now);
 })
 
 afterEach(() => {
@@ -20,6 +24,7 @@ afterAll(async () => {
 describe('Get hotels', () => {
     it('responds with 200', async () => {
         const hotels = hotelService.hotelRepository;
+    
         hotels.findHotels = jest.fn().mockReturnValue([
             {
               id: 'abc2',
