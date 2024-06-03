@@ -3,7 +3,8 @@ FROM node:slim
 ENV NODE_ENV development
 ENV PORT 3000
 ENV SUPPLIERS https://5f2be0b4ffc88500167b85a0.mockapi.io/suppliers/acme,https://5f2be0b4ffc88500167b85a0.mockapi.io/suppliers/patagonia,https://5f2be0b4ffc88500167b85a0.mockapi.io/suppliers/paperflies
-ENV DOWNLOAD true
+ENV MONGO_URL mongodb://127.0.0.1:27017/suppliers
+ENV ENABLE_DOWNLOAD true
 
 WORKDIR /hotel-merge
 

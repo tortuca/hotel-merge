@@ -1,12 +1,11 @@
 import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
-import cache from '../hotels/cache';
+import cache from '../utils/cache';
 
 import HotelRepository from '../hotels/hotels.repository';
-import HotelService from '../hotels/hotels.service';
 import SupplierRepository from '../suppliers/suppliers.repository';
-import { Hotel } from '../hotels/hotels.interface';
+import { IHotel } from '../hotels/hotels.interface';
 import { transformPaperflies, transformAcme, transformPatagonia } from '../utils/transform';
 import { findLongestName, removeDuplicateTags, removeDuplicateLinks, removeStringsIfPresent, mergeDedupe } from '../utils/stringOperators';
 
@@ -29,7 +28,7 @@ class SupplierService {
 
         const now = Date.now();
         cache.set('update', now);
-        console.log(`[cache] newest load and merge = ${now}`);
+        console.log(`[cache] newest load and merge = ${(new Date(now)).toISOString()}`);
     }
 
     public async downloadSuppliers(download: boolean): Promise<any> {
@@ -55,7 +54,7 @@ class SupplierService {
         }
     }
     
-    public async loadHotelsToDb(): Promise<Hotel[]> {
+    public async loadHotelsToDb(): Promise<IHotel[]> {
         try {
             // Parse JSON after reading all files
             const paperfliesData = await this.supplierRepository.getDataBySupplier('paperflies');
@@ -75,8 +74,8 @@ class SupplierService {
         }
     }
     
-    public async mergeSuppliers(paperfliesJson: any, acmeJson: any, patagoniaJson: any): Promise<Hotel[]> {
-        const result: Hotel[] = paperfliesJson.map(transformPaperflies);
+    public async mergeSuppliers(paperfliesJson: any, acmeJson: any, patagoniaJson: any): Promise<IHotel[]> {
+        const result: IHotel[] = paperfliesJson.map(transformPaperflies);
         const acme = acmeJson.map(transformAcme)
         const patagonia = patagoniaJson.map(transformPatagonia);
     

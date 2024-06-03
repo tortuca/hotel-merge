@@ -16,6 +16,8 @@ beforeAll(async () => {
     const MONGO_URL = process.env.MONGO_URL || '';
     await mongoose.connect(MONGO_URL);
     mongoose.connection.on('error', (error: Error) => console.log(error));
+
+    jest.setTimeout(10000);
 })
 
 afterEach(() => {

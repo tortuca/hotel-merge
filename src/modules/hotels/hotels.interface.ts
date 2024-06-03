@@ -1,20 +1,20 @@
-export interface Hotel {
+export interface IHotel {
     id: string;
     destination: number;
     name: string;
-    location: Location;
+    location: ILocation;
     description: string;
     amenities: Record<string, string[]>;
-    images: Record<string, ImageUrl[]>;
+    images: Record<string, IImageUrl[]>;
     booking_conditions: string[];
 }
 
-export interface ImageUrl {
+export interface IImageUrl {
     link: string;
     description: string;
 }
 
-export interface Location {
+export interface ILocation {
     lat: number;
     lng: number;
     address: string;

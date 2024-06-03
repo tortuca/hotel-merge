@@ -1,4 +1,4 @@
-export interface Supplier {
+export interface ISupplier {
     supplier: string;
     data: string;
 }

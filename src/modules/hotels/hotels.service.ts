@@ -1,15 +1,13 @@
-import cache, { isCacheStale } from './cache';
+import cache, { isCacheStale } from '../utils/cache';
 import HotelRepository from './hotels.repository';
-import SupplierService from '../suppliers/suppliers.service';
-import { Hotel } from './hotels.interface';
+import { IHotel } from './hotels.interface';
+import { triggerDownload } from '../utils/cron';
 
 class HotelService {
     public hotelRepository: HotelRepository;
-    public supplierService: SupplierService;
 
     constructor() {
         this.hotelRepository = new HotelRepository();
-        this.supplierService = new SupplierService();
     }
 
     public searchHotels = async ( destination: number, hotels: string[] ) => {
@@ -23,11 +21,10 @@ class HotelService {
             const now : number = Date.now();
 
             let lastUpdatedAt = cache.get('update');
-            console.log(`[cache] last load and merge = ${lastUpdatedAt}`);
             if (!lastUpdatedAt || isCacheStale(now, Number(lastUpdatedAt))) {
+                console.log(`[cache] last load and merge = ${lastUpdatedAt}`);
                 // perform load and merge if not updated recently
-                const enableDownload = (process.env.ENABLE_DOWNLOAD || 'true') === 'true';
-                await this.supplierService.importSupplierData(enableDownload);
+                await triggerDownload();
             }
             
             let result;
@@ -51,7 +48,7 @@ class HotelService {
         }
     }
 
-    public async saveToDb(hotels: Hotel[]) {
+    public async saveToDb(hotels: IHotel[]) {
         return this.hotelRepository.upsertHotels(hotels);
     }
 }

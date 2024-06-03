@@ -1,14 +1,14 @@
-import { Supplier } from './suppliers.interface';
+import { ISupplier } from './suppliers.interface';
 import { SupplierModel } from './suppliers.model';
 
 class SupplierRepository {
     public suppliers = SupplierModel;
 
-    public async getAllSupplierData(): Promise<Supplier[]> {
+    public async getAllSupplierData(): Promise<ISupplier[]> {
         return await this.suppliers.find(); // Retrieve all suppliers
     }
 
-    public async getDataBySupplier(supplier: string): Promise<Supplier | null> {
+    public async getDataBySupplier(supplier: string): Promise<ISupplier | null> {
         return await SupplierModel.findOne({supplier});
     }
 
